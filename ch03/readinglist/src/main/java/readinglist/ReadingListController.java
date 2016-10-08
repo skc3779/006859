@@ -1,12 +1,12 @@
 package readinglist;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/")
@@ -16,7 +16,8 @@ public class ReadingListController {
     private AmazonProperties amazonProperties;
 
     @Autowired
-    public ReadingListController(ReadingListRepository readingListRepository, AmazonProperties amazonProperties) {
+    public ReadingListController(ReadingListRepository readingListRepository,
+                                 AmazonProperties amazonProperties) {
         this.readingListRepository = readingListRepository;
         this.amazonProperties = amazonProperties;
     }

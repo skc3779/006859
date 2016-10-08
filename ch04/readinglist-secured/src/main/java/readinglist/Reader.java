@@ -1,14 +1,13 @@
 package readinglist;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.util.Arrays;
+import java.util.Collection;
 
 @Entity
 public class Reader implements UserDetails {
@@ -69,6 +68,11 @@ public class Reader implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s, %s", username, fullname);
     }
 
 }

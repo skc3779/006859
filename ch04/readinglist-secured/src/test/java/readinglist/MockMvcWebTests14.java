@@ -6,12 +6,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -29,15 +28,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-// 1.3.xx 이전소스로 1.4.xx 에서 duplicate 됨
-@SpringApplicationConfiguration(classes = ReadingListApplication.class)
-@WebAppConfiguration
-public class MockMvcWebTests {
+// 1.4.xx 에서 통합된 Test Annotation 추가됨.
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class MockMvcWebTests14 {
 
     @Autowired
     private WebApplicationContext webContext;
+
     @Autowired
     private ObjectMapper objectMapper;
+
     @Autowired
     private ReaderRepository readerRepository;
 
@@ -58,8 +58,13 @@ public class MockMvcWebTests {
             .andExpect(header().string("Location", "http://localhost/login"));
     }
 
-
-    private void getBook() throws Exception {
+    /**
+     * @WithUserDetails 를 이용한 보안 GET 방식 테스트
+     * @throws Exception
+     */
+    @Test
+    @WithUserDetails("craig")
+    public void homePage_authenticatedUser1() throws Exception {
         mockMvc.perform(post("/")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -68,7 +73,7 @@ public class MockMvcWebTests {
                 .param("isbn", "1234567890")
                 .param("description", "DESCRIPTION"))
                 .andExpect(status().is3xxRedirection())
-                .andDo(print())
+                .andDo(print());
 
         Reader expectedReader = new Reader();
         expectedReader.setUsername("craig");
@@ -82,16 +87,13 @@ public class MockMvcWebTests {
                 .andExpect(model().attribute("reader", samePropertyValuesAs(expectedReader)))
                 .andExpect(model().attribute("books", is(not(hasSize(0)))))
                 .andExpect(model().attribute("amazonID", "habuma-20"));
-
     }
 
-    @Test
-    @WithUserDetails("craig")
-    public void homePage_authenticatedUser1() throws Exception {
-        getBook();
-    }
-
-
+    /**
+     * 추가 테스트
+     * @WithUserDetails 를 이용한 보안 POST 방식 테스트
+     * @throws Exception
+     */
     @Test
     @WithUserDetails("craig")
     public void postBook_authenticatedUser() throws Exception {
@@ -118,11 +120,11 @@ public class MockMvcWebTests {
     }
 
     /**
-     * @WithUserDetails 사용하지 않고 userDetails 를 삽입
+     * @WithUserDetails 사용하지 않고 MockMvc 에 userDetails 를 삽입
+     * 보안 GET 방식 테스트
      * @throws Exception
      */
     @Test
-    //@WithUserDetails("craig")
     public void userDetailsServiceTest() throws Exception {
         UserDetails userDetails = readerRepository.findOne("craig");
         mockMvc.perform(get("/").with(user(userDetails)))

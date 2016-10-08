@@ -1,9 +1,14 @@
 amazon:
   associateId: habuma-20
 
+---
+
+spring:
+  profiles: production
+
 logging:
   level:
-    root: INFO
+    root: ERROR
 
 ---
 
