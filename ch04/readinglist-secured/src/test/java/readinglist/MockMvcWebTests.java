@@ -68,7 +68,7 @@ public class MockMvcWebTests {
                 .param("isbn", "1234567890")
                 .param("description", "DESCRIPTION"))
                 .andExpect(status().is3xxRedirection())
-                .andDo(print())
+                .andDo(print());
 
         Reader expectedReader = new Reader();
         expectedReader.setUsername("craig");
